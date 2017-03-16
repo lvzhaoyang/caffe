@@ -91,6 +91,14 @@ class Layer {
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {}
 
+  virtual inline bool DoesUseCustomCopyBlobs() const {
+    return false;
+  }
+   
+  virtual inline void CustomCopyBlobs(vector<Blob<float>*> blobs) {
+    LOG(FATAL) << "This layer uses custom blob copying, but has not implemented the CustomCopyBlobs method.";
+  }
+
   /**
    * @brief Adjust the shapes of top blobs and internal buffers to accommodate
    *        the shapes of the bottom blobs.

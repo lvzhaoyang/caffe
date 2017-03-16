@@ -261,6 +261,58 @@ class BilinearFiller : public Filler<Dtype> {
   }
 };
 
+template <typename Dtype>
+class DiagonalFiller : public Filler<Dtype> {
+ public:
+  explicit DiagonalFiller(const FillerParameter& param)
+      : Filler<Dtype>(param) {}
+  virtual void Fill(Blob<Dtype>* blob) {
+    CHECK(blob->count());
+    Dtype* blob_data = blob->mutable_cpu_data();
+    caffe_set(blob->count(), Dtype(0), blob_data);
+
+    int kernel_area = static_cast<Dtype>(blob->height()*blob->width());
+    int channels = blob->channels();
+    int num = blob->num();
+
+    for (int n=0; n < num && n < channels; ++n) {
+      Dtype curr_val;
+      if (this->filler_param_.diag_val_size() > n)
+        curr_val = this->filler_param_.diag_val(n);
+      else
+        curr_val = 1;
+      curr_val /= static_cast<Dtype>(kernel_area);
+      caffe_set(kernel_area, curr_val, blob_data + kernel_area * (channels * n + n));
+    }
+    CHECK_EQ(this->filler_param_.sparse(), -1)
+         << "Sparsity not supported by this Filler.";
+  }
+};
+
+/**
+ * @brief Use file to initialize the weights or bias
+ */
+template <typename Dtype>
+class FileFiller : public Filler<Dtype> {
+ public:
+  explicit FileFiller(const FillerParameter& param)
+      : Filler<Dtype>(param) {}
+  virtual void Fill(Blob<Dtype>* blob) {
+	  CHECK(this->filler_param_.has_file());
+	  std::ifstream file(this->filler_param_.file().c_str());
+	  Dtype* data = blob->mutable_cpu_data();
+	  int count = blob->count();
+	  Dtype temp;
+	  for(int i=0; i<count; ++i) {
+		  file >> temp;
+		  data[i] = temp;
+		  std::cout << "Setting " << i << "th position to " << temp << std::endl;
+	  }
+	  CHECK_EQ(this->filler_param_.sparse(), -1)
+	           << "Sparsity not supported by this Filler.";
+  }
+};
+
 /**
  * @brief Get a specific filler from the specification given in FillerParameter.
  *
@@ -284,6 +336,10 @@ Filler<Dtype>* GetFiller(const FillerParameter& param) {
     return new MSRAFiller<Dtype>(param);
   } else if (type == "bilinear") {
     return new BilinearFiller<Dtype>(param);
+  } else if (type == "diagonal") {
+    return new DiagonalFiller<Dtype>(param);
+  } else if (type == "file") {
+    return new FileFiller<Dtype>(param);
   } else {
     CHECK(false) << "Unknown filler name: " << param.type();
   }
