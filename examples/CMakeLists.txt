@@ -1,7 +1,5 @@
 file(GLOB_RECURSE examples_srcs "${PROJECT_SOURCE_DIR}/examples/*.cpp")
 
-find_package(X11 REQUIRED)
-
 foreach(source_file ${examples_srcs})
   # get file name
   get_filename_component(name ${source_file} NAME_WE)
@@ -11,7 +9,7 @@ foreach(source_file ${examples_srcs})
   get_filename_component(folder ${path} NAME_WE)
     
   add_executable(${name} ${source_file})
-  target_link_libraries(${name} ${Caffe_LINK} ${X11_LIBRARIES})
+  target_link_libraries(${name} ${Caffe_LINK})
   caffe_default_properties(${name})
 
   # set back RUNTIME_OUTPUT_DIRECTORY
