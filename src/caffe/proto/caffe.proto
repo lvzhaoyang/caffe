@@ -460,21 +460,26 @@ message LayerParameter {
   optional AugmentationParameter augmentation_param = 149;
   optional CorrelationParameter correlation_param = 150;
   optional L1LossParameter l1_loss_param = 151;
-  optional WriterParameter writer_param = 152;
-  optional ReaderParameter reader_param = 153;
-  optional MeanParameter mean_param = 154;
-  optional ResampleParameter resample_param = 155;
-  optional DownsampleParameter downsample_param = 156;
+  optional MeanParameter mean_param = 152;
+  optional ResampleParameter resample_param = 153;
+  optional DownsampleParameter downsample_param = 154;
 
   // If should run reshape every iteration
-  optional bool reshape_every_iter = 157 [default = true];
+  optional bool reshape_every_iter = 155 [default = true];
 
   // spatial transformer module
   // added by Kaichun Mo
-  optional SpatialTransformerParameter st_param = 158;
-  optional STLossParameter st_loss_param = 159;
-  optional PowerFileParameter power_file_param = 160;
-  optional LocLossParameter loc_loss_param = 161;
+  optional SpatialTransformerParameter st_param = 156;
+  optional STLossParameter st_loss_param = 157;
+  optional PowerFileParameter power_file_param = 158;
+  optional LocLossParameter loc_loss_param = 159;
+
+// Fast RCNN layers
+  optional ROIPoolingParameter roi_pooling_param = 160;
+  optional SmoothL1LossParameter smooth_l1_loss_param = 161;
+  optional FastBatchNormParameter fast_batch_norm_param = 162;
+  optional PSROIPoolingParameter psroi_pooling_param = 163;
+  optional ProposalParameter proposal_param = 164;
 }
 
 // Message storing the actual coefficients of a transformation
@@ -634,20 +639,6 @@ message CorrelationParameter {
 message DownsampleParameter {
   optional uint32 top_height = 1 [default = 0]; // The output height
   optional uint32 top_width = 2 [default = 0]; // The output width
-}
-
-message ReaderParameter {
-    required string file = 1;
-    optional uint32 num = 2 [default=1];
-}
-
-message WriterParameter {
-    optional string file = 1 [default=""];
-    optional string folder = 2 [default=""];
-    optional string prefix = 3 [default=""];
-    optional string suffix = 4 [default=""];
-    optional bool normalize = 5 [default=false];
-    optional float scale = 6 [default=1];
 }
 
 message ResampleParameter {
@@ -1714,4 +1705,48 @@ message PReLUParameter {
   optional FillerParameter filler = 1;
   // Whether or not slope parameters are shared across channels.
   optional bool channel_shared = 2 [default = false];
+}
+
+message ROIPoolingParameter {
+  // Pad, kernel size, and stride are all given as a single value for equal
+  // dimensions in height and width or as Y, X pairs.
+  optional uint32 pooled_h = 1 [default = 0]; // The pooled output height
+  optional uint32 pooled_w = 2 [default = 0]; // The pooled output width
+  // Multiplicative spatial scale factor to translate ROI coords from their
+  // input scale to the scale used when pooling
+  optional float spatial_scale = 3 [default = 1.0];
+  optional float spatial_offset = 4 [default = 0.0];
+}
+
+message SmoothL1LossParameter {
+  // SmoothL1Loss(x) =
+  //   0.5 * (sigma * x) ** 2    -- if x < 1.0 / sigma / sigma
+  //   |x| - 0.5 / sigma / sigma -- otherwise
+  optional float sigma = 1 [default = 1];
+  optional bool pre_fixed_normalization = 2 [default = false];
+  optional float normalizer = 3 [default = 0.0];
+}
+
+message FastBatchNormParameter {
+  // Small value to add to the variance estimate so that we don't divide by
+  // zero.
+  optional float eps = 1 [default = 1e-5];
+}
+
+message PSROIPoolingParameter {
+  required float spatial_scale = 1 [default = 1.0]; 
+  required int32 output_dim = 2; // output channel number
+  required int32 group_size = 3 [default = 1]; // equal to pooled_size
+  optional float spatial_offset = 4 [default = 0.0]; 
+}
+
+message ProposalParameter {
+  optional uint32 feat_stride = 1 [default = 16];
+  optional uint32 base_size = 2 [default = 16];
+  optional uint32 min_size = 3 [default = 16];
+  repeated float ratio = 4;
+  repeated float scale = 5;
+  optional uint32 pre_nms_topn = 6 [default = 6000];
+  optional uint32 post_nms_topn = 7 [default = 300];
+  optional float nms_thresh = 8 [default = 0.7];
 }
