@@ -27,6 +27,7 @@ public:
                          const vector<Blob<Dtype>*>& top);
     virtual void adjust_blobs(vector<Blob<Dtype>*> blobs);
     virtual inline bool AllowBackward() const { LOG(WARNING) << "DataAugmentationLayer does not do backward."; return false; }
+    virtual inline const char* type() const { return "DataAugmentation"; }
 
 protected:
     virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
