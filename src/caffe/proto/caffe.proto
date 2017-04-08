@@ -455,7 +455,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
 
-// By FlowNet and DisparityNet 
+  // By FlowNet and DisparityNet
   optional CoeffScheduleParameter coeff_schedule_param = 148;
   optional AugmentationParameter augmentation_param = 149;
   optional CorrelationParameter correlation_param = 150;
@@ -474,12 +474,16 @@ message LayerParameter {
   optional PowerFileParameter power_file_param = 158;
   optional LocLossParameter loc_loss_param = 159;
 
-// Fast RCNN layers
+  // Fast RCNN layers
   optional ROIPoolingParameter roi_pooling_param = 160;
   optional SmoothL1LossParameter smooth_l1_loss_param = 161;
   optional FastBatchNormParameter fast_batch_norm_param = 162;
   optional PSROIPoolingParameter psroi_pooling_param = 163;
   optional ProposalParameter proposal_param = 164;
+
+  // All the customized layers
+  optional ExpectationParameter expectation_param = 165;
+
 }
 
 // Message storing the actual coefficients of a transformation
@@ -1492,6 +1496,21 @@ message WindowDataParameter {
   optional bool cache_images = 12 [default = false];
   // append root_folder to locate images
   optional string root_folder = 13 [default = ""];
+}
+
+// Message that stores parameters used by ExpectationLayer
+message ExpectationParameter {
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 1 [default = DEFAULT];
+
+  // The axis along which to perform the expectation -- may be negative to index
+  // from the end (e.g., -1 for the last axis).
+  // Any other axes will be evaluated as independent softmaxes.
+  optional int32 axis = 2 [default = 1];
 }
 
 message SPPParameter {
