@@ -20,7 +20,7 @@ public:
     const vector<Blob<Dtype>*>& top);
 
   virtual inline const char* type() const { return "Expectation"; }
-  virtual inline int ExactNumBottomBlobs() const { return 1; }
+  virtual inline int ExactNumBottomBlobs() const { return 2; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
 protected:
@@ -36,8 +36,6 @@ protected:
   int outer_num_;
   int inner_num_;
   int expectation_axis_;
-
-  Blob<Dtype> scale_;
 };
 
 }

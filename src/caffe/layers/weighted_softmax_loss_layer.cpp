@@ -103,7 +103,7 @@ void WeightedSoftmaxWithLossLayer<Dtype>::Forward_cpu(
   int count = 0;
   Dtype loss = 0;
   for (int i = 0; i < outer_num_; ++i) {
-    for (int j = 0; j < inner_num_; j++) {
+    for (int j = 0; j < inner_num_; ++j) {
       const int label_value = static_cast<int>(label[i * inner_num_ + j]);
       const Dtype weight_value = weight[i * inner_num_ + j];
       if (has_ignore_label_ && label_value == ignore_label_) {
