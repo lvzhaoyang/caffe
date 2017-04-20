@@ -40,6 +40,18 @@ message Datum {
   optional bool encoded = 7 [default = false];
 }
 
+message VolumeDatum {
+  optional int32 channels = 1;
+  optional int32 length = 2 [default = 1];
+  optional int32 height = 3;
+  optional int32 width = 4;
+  // the actual image data, in bytes
+  optional bytes data = 5;
+  optional int32 label = 6;
+  // Optionally, the datum could also hold float data.
+  repeated float float_data = 7;
+}
+
 message FillerParameter {
   // The filler type.
   optional string type = 1 [default = 'constant'];
@@ -60,9 +72,8 @@ message FillerParameter {
   }
   optional VarianceNorm variance_norm = 8 [default = FAN_IN];
 
-  repeated float diag_val = 9;
-
-  optional string file = 10; // 0 in original STN-caffe, changed by zlv30
+  repeated float diag_val = 9; // created in FlowNet
+  optional string file = 10;   // 0 in original STN-caffe, changed by zlv30
 }
 
 message NetParameter {
@@ -358,6 +369,7 @@ message ParamSpec {
 // Update the next available ID when you add a new LayerParameter field.
 //
 // LayerParameter next available layer-specific ID: 147 (last added: recurrent_param)
+// C3D uses ID from 6660
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -484,6 +496,9 @@ message LayerParameter {
   // All the customized layers
   optional ExpectationParameter expectation_param = 165;
 
+  // C3D parameters
+  optional Convolution3DParameter convolution3d_param = 6661;
+  optional Pooling3DParameter pooling3d_param = 6662;
 }
 
 // Message storing the actual coefficients of a transformation
@@ -891,6 +906,21 @@ message ConvolutionParameter {
   optional bool force_nd_im2col = 17 [default = false];
 }
 
+message Convolution3DParameter {
+  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional bool bias_term = 2 [default = true]; // whether to have bias terms
+  optional uint32 pad = 3 [default = 0]; // The padding size
+  optional uint32 kernel_size = 4; // The kernel size
+  optional uint32 group = 5 [default = 1]; // The group size for group conv
+  optional uint32 kernel_depth = 6; // The kernel size
+  optional uint32 stride = 7 [default = 1]; // The stride
+  optional uint32 temporal_stride = 8 [default = 1]; // The stride for temporal
+  optional FillerParameter weight_filler = 9; // The filler for the weight
+  optional FillerParameter bias_filler = 10; // The filler for the bias
+  optional uint32 filter_group = 11 [default = 1]; // divide filters into groups to reduce memory consumption
+  optional uint32 temporal_pad = 12 [default = 0]; // padding size for temporal
+}
+
 message CropParameter {
   // To crop, elements of the first bottom are selected to fit the dimensions
   // of the second, reference bottom. The crop is configured by
@@ -1230,6 +1260,22 @@ message PoolingParameter {
   // If global_pooling then it will pool over the size of the bottom by doing
   // kernel_h = bottom->height and kernel_w = bottom->width
   optional bool global_pooling = 12 [default = false];
+}
+
+// Message that stores parameters used by PoolingLayer
+message Pooling3DParameter {
+  enum PoolMethod {
+    MAX = 0;
+    AVE = 1;
+    STOCHASTIC = 2;
+  }
+  optional PoolMethod pool = 1 [default = MAX]; // The pooling method
+  optional uint32 kernel_size = 2; // The kernel size
+  optional uint32 stride = 3 [default = 1]; // The stride
+  // The padding size -- currently implemented only for average pooling.
+  optional uint32 pad = 4 [default = 0];
+  optional uint32 kernel_depth = 5;
+  optional uint32 temporal_stride = 6 [default = 1]; // The stride
 }
 
 message PowerParameter {
