@@ -45,3 +45,11 @@ Examples:
 You can also build Caffe and run the tests in the image:
 
 `docker run -ti caffe:cpu bash -c "cd /opt/caffe/build; make runtest"`
+
+### Run docker image for this customized caffe
+
+`docker run lvzhaoyang/caffe:custom`
+
+### To mount the data-drive in customized caffe
+
+`docker run -it -v ~/data-hd1:/data-hd1  lvzhaoyang/caffe:custom`
