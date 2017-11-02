@@ -463,17 +463,21 @@ void DataAugmentationLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& botto
             matrices[item_id].toIdentity();
             matrices[item_id].fromCoeff(&coeff,cropped_width_,cropped_height_,bottomwidth,bottomheight);
 
-            chromatics[item_id].fromCoeff(&coeff);
-            if(chromatics[item_id].needsComputation())
-                has_chromatic_augmentation=true;
+            if (!aug_.skip_chromatic()) {
+  		// added by Zhaoyang
+        	// force to skip chromatic augmentation.
+                chromatics[item_id].fromCoeff(&coeff);
+                if(chromatics[item_id].needsComputation())
+                    has_chromatic_augmentation=true;
 
-            chromatics_eigen[item_id].fromCoeff(&coeff);
-            if(chromatics_eigen[item_id].needsComputation())
-                has_chromatic_eigen_augmentation=true;
+                chromatics_eigen[item_id].fromCoeff(&coeff);
+                if(chromatics_eigen[item_id].needsComputation())
+                    has_chromatic_eigen_augmentation=true;
 
-            effects[item_id].fromCoeff(&coeff);
-            if(effects[item_id].needsComputation())
-                has_effect_augmentation=true;
+                effects[item_id].fromCoeff(&coeff);
+                if(effects[item_id].needsComputation())
+                    has_effect_augmentation=true;
+            }
 
             //LOG(INFO) << "matrix " << item_id << ": " << matrices[item_id].t0 << ", " << matrices[item_id].t1 << ", " << matrices[item_id].t2 << ", " << matrices[item_id].t3 << ", " << matrices[item_id].t4 << ", " << matrices[item_id].t5;
             //LOG(INFO) << "cw/2 , ch/2: " << .5 * static_cast<float>(cropped_width_) << ", " << .5 * static_cast<float>(cropped_height_);

@@ -585,6 +585,8 @@ message AugmentationParameter {
 
   repeated float chromatic_eigvec = 83;
 
+  optional bool skip_chromatic = 84 [default = false]; // skip the chromatic augmentation
+
   // Spatial
   optional RandomGeneratorParameter mirror = 10;
   optional RandomGeneratorParameter translate = 11 ;
